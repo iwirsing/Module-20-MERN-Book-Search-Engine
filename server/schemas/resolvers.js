@@ -6,7 +6,7 @@ const resolvers = {
     Query: {
         me: async (parent, args, context) => {
             if (context.user) {
-                const userData = await User.findOne({ _id: context.user._id }).select('-__v -password');
+                const userData = await User.findOne({ _id: context.user._id }).select('-__v -password').populate('books');
                 return userData;
             };
             throw new AuthenticationError('Not logged in!');
@@ -45,26 +45,27 @@ const resolvers = {
             // Return an `Auth` object that consists of the signed token and user's information
             return { token, user };
         },
-        saveBook: async (parent, { bookData }, context) => {
+        saveBook: async (parent, { bookToSave }, context) => {
 
             if (context.user) {
-                const updateUser = await User.findOneByIdAndUpdate(
+                const updatedUser = await User.findOneAndUpdate(
                     { _id: context.user._id },
-                    { $push: { saveBooks: bookData } },
-                    { new: true }
+                    // { $push: { savedBooks: bookToSave } },
+                    {$addToSet: {savedBooks: bookToSave}}, 
+                    { new: true, runValidators: true }
                 );
-                return updateUser;
+                return updatedUser;
             }
             throw AuthenticationError('You need to be logged in to save book.')
         },
-        removeBook: async (parent, { bookId }, context) => {
+        removeBook: async (parent, args, context) => {
             if (context.user) {
-                const updateUser = await User.findOneAndUpdate(
+                const updatedUser = await User.findOneAndUpdate(
                     { _id: context.user._id },
-                    { $pull: { saveBooks: {bookId} } },
+                    { $pull: { savedBooks: {bookId: args.bookId} } },
                     { new: true }
                 );
-                return updateUser;
+                return updatedUser;
             }
             throw AuthenticationError ('You need to be logged in to remove book.')
         }
