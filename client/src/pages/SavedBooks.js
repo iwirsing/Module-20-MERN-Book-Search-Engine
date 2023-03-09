@@ -20,7 +20,7 @@ const SavedBooks = () => {
   console.log(userData);
 
   //to use the Apollo hook useMutation to remove book
-  const [removeBook, {error}]= useMutation(REMOVE_BOOK);
+  const [removeBook]= useMutation(REMOVE_BOOK);
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
@@ -37,6 +37,7 @@ const SavedBooks = () => {
       removeBookId(bookId);
       
     } catch (err) {
+      console.log(JSON.stringify(err, null, 2));
       console.error(err);
     }
   };

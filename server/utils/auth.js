@@ -6,7 +6,7 @@ const expiration = '2h';
 
 module.exports = {
   // function for our authenticated routes
-  authMiddleware: function ({req}) {
+  authMiddleware: function ({req,res}) {
     // allows token to be sent via  req.body headers or query
     let token = req.headers.authorization ||req.body.token||req.query.token;
 
